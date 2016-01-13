@@ -35,26 +35,22 @@ nlCity <- raster::getData('GADM',country='NLD', level=2)
 #put both dataframes in same projection
 nlCityUTM <- spTransform(nlCity, CRS(proj4string(modisNDVIlayers)))
 
-
 #get greenest municipality per month (input = in numbers)
 source('R/calcGreenestMunicipality.R')
-showGreenestMuni(1)
-r <- modisNDVIlayers
-r
-#get maximum greenness of municipalities per year
-extraNDVIStat <- extract(r, nlCityUTM, layer=ALL, fun=mean)
+showGreenestMuni(8)
+#get maximum greenness of municipalities per year (credits to Froede and Daryll)
+extraNDVIStat <- extract(modisNDVIlayers, nlCityUTM, fun=mean, df=TRUE, full.names=TRUE, sp=TRUE)
+NDVIdataframe <- as.data.frame(extraNDVIStat)
+#remove Na's
+NDVIdataframe[is.na(NDVIdataframe)] <- 0
 
-#avg per municipality
-greenestMuniciStat <- nlCityUTM$NAME_2[extraNDVIStat == StatisticalProperty(extraNDVIStat)]
-paste("Greenest municipality over the year =", greenestMuniciStat)
+#selecting greenest municipality per year
+greenestMunicipAvg <-  NDVIdf$NAME_2[NDVIdf[[16]]==max(NDVIdf[[16]])]
+paste("Greenest municipality = ", greenestMunicipAvg)
+
 
 #source('R/calcGreennessPerYear.R')
 
-showGreennessMunicipal(max)
-
-extractedNDVIStat <- extract(r, nlCityUTM, nl=12, fun=mean, na.rm=TRUE)
-
-greenMunicipalPoly <- mask(modisNDVIlayers[[1]], nlCityUTM[nlCityUTM$NAME_2 == greenestMuniciAvg,])
 
 # Set graphical parameters
 plot(greenMunicipalPoly, main='Greenest municipality', ylim=c(5850000, 5950000), xlim=c(350000, 420000))

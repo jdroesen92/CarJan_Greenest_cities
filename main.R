@@ -41,13 +41,15 @@ showGreenestMuni(8)
 #get maximum greenness of municipalities per year (credits to Froede and Daryll)
 extraNDVIStat <- extract(modisNDVIlayers, nlCityUTM, fun=mean, df=TRUE, full.names=TRUE, sp=TRUE)
 NDVIdataframe <- as.data.frame(extraNDVIStat)
+
 #remove Na's
 NDVIdataframe[is.na(NDVIdataframe)] <- 0
+avgNDVIyear<- rowMeans(NDVIdataframe[,16:27])
+NDVIdataframe <- cbind(NDVIdataframe, avgNDVIyear)
 
 #selecting greenest municipality per year
-greenestMunicipAvg <-  NDVIdf$NAME_2[NDVIdf[[16]]==max(NDVIdf[[16]])]
+greenestMunicipAvg <-  NDVIdataframe$NAME_2[NDVIdataframe[[28]]==max(NDVIdataframe[[28]])]
 paste("Greenest municipality = ", greenestMunicipAvg)
-
 
 #source('R/calcGreennessPerYear.R')
 
